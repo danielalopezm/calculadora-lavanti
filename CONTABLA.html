@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Propuestas LaaS - Lavanti</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1 { font-size: 2.25rem; font-weight: 800; color: #1e293b; }
+        h2 { font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+        h4 { font-size: 1.1rem; font-weight: 600; color: #475569; }
+        .btn { cursor: pointer; transition: background-color: 0.3s; }
+        .btn-add { background-color: #16a34a; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
+        .btn-remove { background-color: #fee2e2; color: #dc2626; padding: 0.25rem; border-radius: 9999px; display: inline-flex; align-items: center; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-10">
+            <img src="https://lavanti.com/wp-content/uploads/2022/10/logo-lavanti.png" alt="Logo Lavanti" class="mx-auto h-12 mb-4">
+            <h1>Calculadora de Propuestas "As a Service"</h1>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="card p-6">
+                    <h2 class="!mt-0">Paso 1: Datos del Cliente</h2>
+                    <input type="text" id="clientName" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Ej: Hotel IROTAMA">
+                </div>
+                <div class="card p-6">
+                    <h2 class="!mt-0">Paso 2: Agregue Equipos</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div><label for="select-lavadoras" class="font-semibold text-indigo-700">Lavadoras</label><select id="select-lavadoras" class="w-full p-2 border equipment-select"></select><button data-select-id="select-lavadoras" class="btn btn-add w-full mt-2">Agregar</button></div>
+                        <div><label for="select-secadoras" class="font-semibold text-amber-700">Secadoras</label><select id="select-secadoras" class="w-full p-2 border equipment-select"></select><button data-select-id="select-secadoras" class="btn btn-add w-full mt-2">Agregar</button></div>
+                        <div><label for="select-planchadoras" class="font-semibold text-sky-700">Planchado y Otros</label><select id="select-planchadoras" class="w-full p-2 border equipment-select"></select><button data-select-id="select-planchadoras" class="btn btn-add w-full mt-2">Agregar</button></div>
+                    </div>
+                    <div id="equipment-preview" class="mt-6 border-t-2 border-dashed pt-4 text-center min-h-[150px]"><p class="text-gray-500 italic">Seleccione un equipo para ver sus detalles</p></div>
+                </div>
+                 <div class="card p-6">
+                    <h2 class="!mt-0">Paso 3: Análisis de Capacidad y Operación</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div class="space-y-1"><label for="kilos-estimados" class="text-sm font-medium">Kilos estimados / día</label><input type="number" id="kilos-estimados" value="500" class="w-full p-2 border rounded-lg analysis-input"></div>
+                        <div class="space-y-1"><label for="horas-operacion" class="text-sm font-medium">Horas de operación / día</label><input type="number" id="horas-operacion" value="8" class="w-full p-2 border rounded-lg analysis-input"></div>
+                        <div class="space-y-1"><label for="productividad" class="text-sm font-medium">Productividad (Kg/Hora/Persona)</label><input type="number" id="productividad" value="25" class="w-full p-2 border rounded-lg analysis-input"></div>
+                        <div class="space-y-1"><label for="factor-carga" class="text-sm font-medium">Factor de carga (Volumen)</label><select id="factor-carga" class="w-full p-2 border rounded-lg analysis-input"><option value="10">1:10</option><option value="11" selected>1:11</option><option value="12">1:12</option></select></div>
+                        <div class="col-span-1 md:col-span-2 border-t mt-4 pt-4 space-y-2">
+                             <div class="flex justify-between"><span>Capacidad de Lavado Instalada:</span><span id="display-capacidad-instalada" class="font-bold text-right">0 Kg</span></div>
+                             <div class="flex justify-between"><span>Capacidad Real de Carga:</span><span id="display-capacidad-real" class="font-bold text-right">0 Kg</span></div>
+                             <div class="flex justify-between"><span>Personas Necesarias por Turno:</span><span id="display-personas" class="font-bold text-right">0</span></div>
+                             <div class="flex justify-between text-lg"><span class="font-semibold">Costo Mano de Obra Mensual:</span><span id="display-mano-obra" class="font-bold text-right">$0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:col-span-1">
+                <div class="card p-6 sticky top-8">
+                     <h2 class="!mt-0">Resumen de la Propuesta</h2>
+                     <div id="selected-equipment-list" class="space-y-2 mb-6 min-h-[150px]"></div>
+                     <div class="border-t pt-4">
+                        <div class="bg-gray-100 p-4 rounded-lg text-center mt-4">
+                            <p class="font-semibold text-gray-800">Pago Fijo Mensual (+IVA)</p>
+                            <p id="final-monthly-payment" class="text-4xl font-extrabold my-2 text-gray-900">$0</p>
+                            <p id="contract-term-display" class="text-sm font-medium text-gray-600">(Plazo a calcular)</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const APP_DATA = {
+                trm: 4081.15,
+                smlv: 2225000,
+                parameters: { Viaticos: 0.0048, inflación: 1.056, Logistica: 0.00015, Costos_admin: 0.0155, intereses: 0.0015, Depreciación: 0.0074 },
+                equipment: [
+                    {"modelo":"DR55","tipo":"Secadora","valorDolares":3370,"costosOp":25000,"capacidad":25,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/jltvjqbdba/png/DR75_OPL_OPTimum_Front.png"},
+                    {"modelo":"UT75","tipo":"Secadora","valorDolares":4478.5,"costosOp":90000,"capacidad":34,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/uh9zbhavxg/png/UT075_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"UT120","tipo":"Secadora","valorDolares":8059.5,"costosOp":90000,"capacidad":55,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tb5lye8wud/png/UT200_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"UT170","tipo":"Secadora","valorDolares":10678,"costosOp":90000,"capacidad":77,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tb5lye8wud/png/UT200_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"UT200","tipo":"Secadora","valorDolares":13169.5,"costosOp":90000,"capacidad":90,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tb5lye8wud/png/UT200_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"UT120E","tipo":"Secadora eléctrica","valorDolares":10440.5,"costosOp":90000,"capacidad":55,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tb5lye8wud/png/UT200_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"DR55E","tipo":"Secadora eléctrica","valorDolares":3622,"costosOp":25000,"capacidad":25,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/jltvjqbdba/png/DR75_OPL_OPTimum_Front.png"},
+                    {"modelo":"UT75E","tipo":"Secadora eléctrica","valorDolares":4999.5,"costosOp":90000,"capacidad":34,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/uh9zbhavxg/png/UT075_OPL_UniLincTouch_White_Front.png"},
+                    {"modelo":"UY180","tipo":"Lavadora suspendida","valorDolares":6176,"costosOp":230000,"capacidad":18,"volumenTambor":180,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/ahj2ibtihq/png/UY65-280_OPL_M9Control_Front.png"},
+                    {"modelo":"UY240","tipo":"Lavadora suspendida","valorDolares":8665,"costosOp":230000,"capacidad":24,"volumenTambor":240,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/ahj2ibtihq/png/UY65-280_OPL_M9Control_Front.png"},
+                    {"modelo":"UY600","tipo":"Lavadora suspendida","valorDolares":20658,"costosOp":230000,"capacidad":60,"volumenTambor":600,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/z1oneuekxg/png/UY350-600_UniLincTouch_Front.png"},
+                    {"modelo":"UY800","tipo":"Lavadora suspendida","valorDolares":30526,"costosOp":230000,"capacidad":80,"volumenTambor":800,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/3fznvyq2py/png/UY800-1200_UniLincTouch_Front.png"},
+                    {"modelo":"UY1000","tipo":"Lavadora suspendida","valorDolares":33686,"costosOp":230000,"capacidad":100,"volumenTambor":1000,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/3fznvyq2py/png/UY800-1200_UniLincTouch_Front.png"},
+                    {"modelo":"UY1200","tipo":"Lavadora suspendida","valorDolares":36560.5,"costosOp":230000,"capacidad":1200,"volumenTambor":1200,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/3fznvyq2py/png/UY800-1200_UniLincTouch_Front.png"},
+                    {"modelo":"UY450","tipo":"Lavadora suspendida","valorDolares":17782,"costosOp":230000,"capacidad":45,"volumenTambor":4500,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/z1oneuekxg/png/UY350-600_UniLincTouch_Front.png"},
+                    {"modelo":"UY350","tipo":"Lavadora suspendida","valorDolares":16660,"costosOp":230000,"capacidad":35,"volumenTambor":3500,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/z1oneuekxg/png/UY350-600_UniLincTouch_Front.png"},
+                    {"modelo":"IA180","tipo":"Lavadora rígida","valorDolares":4858.5,"costosOp":95000,"capacidad":18,"volumenTambor":180,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/21mg6deqb4/png/IA180_OPL_AriesElite_Front.png"},
+                    {"modelo":"IA520","tipo":"Lavadora rígida","valorDolares":10323.5,"costosOp":95000,"capacidad":53,"volumenTambor":520,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tsujjgfgnk/png/IA332-520_OPL_AriesElite_Front.png"},
+                    {"modelo":"IA240","tipo":"Lavadora rígida","valorDolares":5182,"costosOp":95000,"capacidad":24,"volumenTambor":240,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/21mg6deqb4/png/IA180_OPL_AriesElite_Front.png"},
+                    {"modelo":"UW65","tipo":"Lavadora alta extracción","valorDolares":10704,"costosOp":65000,"capacidad":30,"volumenTambor":27.5,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/ihrfxp0nkx/png/UW65_OPL_UniLincTouch_Fire_PPEGear_Front.png"},
+                    {"modelo":"UW105","tipo":"Lavadora alta extracción","valorDolares":16599,"costosOp":65000,"capacidad":47.6,"volumenTambor":45,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/qzadeeyrsh/png/UW105_OPL_UniLincTouch_Front.png"},
+                    {"modelo":"UW130","tipo":"Lavadora alta extracción","valorDolares":19290,"costosOp":65000,"capacidad":60,"volumenTambor":55.5,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/trbf1ngwzk/png/UW130_OPL_M30_Front.png"},
+                    {"modelo":"UW160","tipo":"Lavadora alta extracción","valorDolares":21435,"costosOp":65000,"capacidad":72.6,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/rar5bk1bc1/png/UW160_OPL_UniLincTouch_Front.png"},
+                    {"modelo":"UW200","tipo":"Lavadora alta extracción","valorDolares":23997,"costosOp":65000,"capacidad":90,"volumenTambor":85.2,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/rar5bk1bc1/png/UW160_OPL_UniLincTouch_Front.png"},
+                    {"modelo":"IA332","tipo":"Lavadora rígida","valorDolares":10323.5,"costosOp":95000,"capacidad":32,"volumenTambor":332,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/tsujjgfgnk/png/IA332-520_OPL_AriesElite_Front.png"},
+                    {"modelo":"FCU 500/3200 G","tipo":"Rodillo 3 mts.","valorDolares":20121,"costosOp":455000,"capacidad":100,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/fajqho5ru9/png/FCU500_OPL_MCX_Front.png"},
+                    {"modelo":"FCU2080/320 G","tipo":"Rodillo 2 mts.","valorDolares":7720.5,"costosOp":400000,"capacidad":72,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/jkwt3vfm5k/png/FCU320_OPL_MCX_Front.png"},
+                    {"modelo":"I25","tipo":"Rodillo eléctrico","valorDolares":2565,"costosOp":80000,"capacidad":40,"volumenTambor":null,"imagenUrl":"https://alliancelaundrysystems.widen.net/content/hg6uoxcxqa/png/I-range_ChestHeatedIroner_Front.png"},
+                    {"modelo":"SFN","tipo":"Lavadora semi industrial","valorDolares":1876,"costosOp":25000,"capacidad":9.5,"volumenTambor":null,"imagenUrl":null},
+                    {"modelo":"STE","tipo":"Torre Lav/sec eléctrica","valorDolares":3040.5,"costosOp":25000,"capacidad":9.5,"volumenTambor":null,"imagenUrl":null},
+                    {"modelo":"STG","tipo":"Torre Lav/sec gas","valorDolares":2903.5,"costosOp":85000,"capacidad":9.5,"volumenTambor":null,"imagenUrl":null},
+                    {"modelo":"Nettuno","tipo":"Mesa de planchado","valorDolares":2500,"costosOp":110000,"capacidad":0,"volumenTambor":null,"imagenUrl":null},
+                    {"modelo":"421SL prensa vapor","tipo":"Prensa vapor","valorDolares":9468,"costosOp":200000,"capacidad":0,"volumenTambor":null,"imagenUrl":null},
+                    {"modelo":"54VLT","tipo":"Prensa cabezote caliente","valorDolares":8694,"costosOp":200000,"capacidad":0,"volumenTambor":null,"imagenUrl":null}
+                ]
+            };
+            const state = { selectedEquipment: [] };
+
+            const app = {
+                // ... (el objeto app con todas las funciones)
+            };
+
+            app.init();
+        });
+    </script>
+
+</body>
+</html>
