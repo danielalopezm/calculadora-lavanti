@@ -121,11 +121,90 @@
             };
             const state = { selectedEquipment: [] };
 
-            const app = {
-                // ... (el objeto app con todas las funciones)
-            };
+            function fillEquipmentSelects() {
+                const selects = {
+                    'Lavadora': document.getElementById('select-lavadoras'),
+                    'Secadora': document.getElementById('select-secadoras'),
+                    'Planchado y Otros': document.getElementById('select-planchadoras')
+                };
 
-            app.init();
+                APP_DATA.equipment.forEach(eq => {
+                    let group = null;
+                    if (eq.tipo.toLowerCase().includes('lavadora')) group = 'Lavadora';
+                    else if (eq.tipo.toLowerCase().includes('secadora')) group = 'Secadora';
+                    else group = 'Planchado y Otros';
+
+                    const option = document.createElement('option');
+                    option.value = eq.modelo;
+                    option.textContent = `${eq.modelo} (${eq.tipo})`;
+                    selects[group].appendChild(option);
+                });
+            }
+
+            function setupAddButtons() {
+                document.querySelectorAll('.btn-add').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const selectId = btn.getAttribute('data-select-id');
+                        const select = document.getElementById(selectId);
+                        const modelo = select.value;
+                        const equipo = APP_DATA.equipment.find(eq => eq.modelo === modelo);
+                        if (equipo) {
+                            state.selectedEquipment.push(equipo);
+                            renderSelectedEquipment();
+                        }
+                    });
+                });
+            }
+
+            function renderSelectedEquipment() {
+                const list = document.getElementById('selected-equipment-list');
+                list.innerHTML = '';
+                state.selectedEquipment.forEach((eq, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center bg-gray-50 p-2 rounded';
+                    div.innerHTML = `
+                        <span>${eq.modelo} (${eq.tipo})</span>
+                        <button class="btn btn-remove" data-idx="${idx}">Quitar</button>
+                    `;
+                    list.appendChild(div);
+                });
+
+                // Botón quitar
+                list.querySelectorAll('.btn-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(btn.getAttribute('data-idx'));
+                        state.selectedEquipment.splice(idx, 1);
+                        renderSelectedEquipment();
+                    });
+                });
+
+                // Renderizar previsualización central
+                const preview = document.getElementById('equipment-preview');
+                if (state.selectedEquipment.length === 0) {
+                    preview.innerHTML = '<p class="text-gray-500 italic">Seleccione un equipo para ver sus detalles</p>';
+                } else {
+                    preview.innerHTML = state.selectedEquipment.map(eq => `
+                        <div class="flex flex-col md:flex-row items-center gap-4 mb-4 p-4 bg-white rounded shadow">
+                            ${eq.imagenUrl ? `<img src="${eq.imagenUrl}" alt="${eq.modelo}" class="h-20 object-contain">` : ''}
+                            <div class="text-left">
+                                <div class="font-bold text-lg">${eq.modelo}</div>
+                                <div class="text-sm text-gray-600">${eq.tipo}</div>
+                                <div class="text-sm">Capacidad: <span class="font-semibold">${eq.capacidad || '-'} kg</span></div>
+                                ${eq.volumenTambor ? `<div class="text-sm">Volumen tambor: <span class="font-semibold">${eq.volumenTambor}</span></div>` : ''}
+                                <div class="text-sm">Costo Op: <span class="font-semibold">$${eq.costosOp.toLocaleString()}</span></div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            function init() {
+                fillEquipmentSelects();
+                setupAddButtons();
+                renderSelectedEquipment();
+            }
+
+            init();
         });
     </script>
 
